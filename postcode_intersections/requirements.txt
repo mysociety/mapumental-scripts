@@ -1,0 +1,5 @@
+GDAL==1.11.2
+numpy==1.9.2
+psycopg2==2.5.1
+pyproj==1.9.3
+requests==2.6.0

@@ -1,0 +1,7 @@
+rasters/*.arx
+.env
+places.json
+data.csv
+shapefiles/
+urls.txt
+output.csv

@@ -9,6 +9,8 @@ postcode sectors can reach each place within 45 & 90 minutes by 08:30.
 Not only that, but you want to know what *percentage* of the area of each
 postcode sector can reach each place.
 
+![QGIS Screenshot](images/qgis.png)
+
 The output of the script is a CSV with the following columns:
 
  * Place ID
@@ -178,3 +180,25 @@ This can be achieved with one command:
 
 The file will be written to `output.csv`. The command takes a while to run,
 during which most of the heavy lifting is done by the PostgreSQL server.
+
+### 9. Exporting data as shapefiles
+
+You can extract the data into a shapefile for further analysis in [QGIS](http://www.qgis.org/) or ArcGIS etc.
+
+Let's say you want a shapefile showing sectors from where one particular place
+can be reached within 90 minutes. You'll need to find the `map_id` value for
+the place in `places.json`. Assuming the `map_id` is `84f1a794ebc1cf9ea9b285d19f1b7255fcd312fd`:
+
+    $ pgsql2shp -f output.shp postcode_intersections "SELECT * FROM intersections where minutes = 90 and label = '84f1a794ebc1cf9ea9b285d19f1b7255fcd312fd'"
+
+Depending on how many sectors can reach this place the command might take a few
+minutes to run. When it does, you'll find a shapefile `output.shp` in the
+current directory that you can load into your GIS tool.
+
+Each polygon in the tool represents partial or total coverage of an individual
+postcode sector. The attributes `sectorarea` and `interarea` tell you the area
+of the postcode sector and the area covered by that feature respectively. The
+units of the values are as output by PostGIS's `ST_Area` and are probably
+meaningless by themselves, but you can calculate the percentage of a sector
+covered by a feature using `(interarea / sectorarea) * 100`. Note that each
+postcode sector might be covered by more than one polygon, so ensure you sum the `interarea` values for all features covering each postcode sector.
